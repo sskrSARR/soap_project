@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+    mysql:
+        image: mysql:8.0
+        container_name: container-mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: soapdb
+            MYSQL_USER: sarr
+            MYSQL_PASSWORD: passer
+        ports:
+            - "3307:3306"
+        volumes:
+            - mysql_data:/var/lib/mysql
+        networks:
+            - db
+        healthcheck:
+            test: mysqladmin ping -h 127.0.0.1 -u$$MYSQL_USER --password=$$MYSQL_PASSWORD
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin:latest
+        container_name: container-phpmyadmin
+        ports:
+            - "81:80"
+        environment:
+            PMA_HOST: mysql
+            PMA_USER: sarr
+            PMA_PASSWORD: passer
+            MYSQL_ROOT_PASSWORD: root
+        depends_on:
+            - mysql
+        restart: unless-stopped
+        networks:
+            - db
+
+volumes:
+    mysql_data:
+
+networks:
+    db:
